@@ -1,0 +1,117 @@
+@import "tailwindcss";
+@import "./styles/theme.css";
+
+/* ========================================
+   Base Styles
+   ======================================== */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
+
+html {
+  scroll-behavior: smooth;
+}
+
+body {
+  background-color: var(--color-background, #fff8f6);
+  color: var(--color-on-background, #261815);
+  font-family: 'Fira Sans', system-ui, -apple-system, sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+  margin: 0;
+  padding: 0;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+/* ========================================
+   Tailwind v4 theme overrides
+   Maps CSS vars → Tailwind utility classes
+   ======================================== */
+@theme {
+  --color-background: #fff8f6;
+  --color-on-background: #261815;
+  --color-surface: #fff8f6;
+  --color-on-surface: #261815;
+  --color-on-surface-variant: #5a413c;
+  --color-surface-container-lowest: #ffffff;
+  --color-surface-container-low: #fff0ee;
+  --color-surface-container: #ffe9e5;
+  --color-surface-container-high: #fde2dd;
+  --color-surface-container-highest: #f7ddd8;
+  --color-surface-dim: #eed4cf;
+  --color-surface-bright: #fff8f6;
+  --color-surface-variant: #f7ddd8;
+  --color-surface-tint: #b02d15;
+
+  --color-primary: #b02d15;
+  --color-primary-container: #d3462b;
+  --color-on-primary: #ffffff;
+  --color-on-primary-container: #130100;
+  --color-primary-fixed: #ffdad3;
+  --color-inverse-primary: #ffb4a5;
+
+  --color-secondary: #954838;
+  --color-secondary-container: #fe9c88;
+  --color-on-secondary: #ffffff;
+
+  --color-tertiary: #00629e;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-container: #227bbf;
+
+  --color-error: #ba1a1a;
+  --color-on-error: #ffffff;
+  --color-error-container: #ffdad6;
+
+  --color-outline: #8e706a;
+  --color-outline-variant: #e2bfb8;
+
+  --color-inverse-surface: #3d2d2a;
+  --color-inverse-on-surface: #ffede9;
+
+  /* Ink / Paper aliases */
+  --color-ink: #261815;
+  --color-ink-muted: #954838;
+  --color-paper: #fff8f6;
+  --color-paper-lowest: #ffffff;
+  --color-chili-red: #d3462b;
+
+  /* Font families */
+  --font-headline: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-display: 'Hanken Grotesk', system-ui, sans-serif;
+  --font-body: 'Fira Sans', system-ui, sans-serif;
+  --font-mono: 'Space Mono', ui-monospace, monospace;
+}
+
+/* ========================================
+   Selection style
+   ======================================== */
+::selection {
+  background-color: var(--color-primary-container);
+  color: var(--color-on-primary);
+}
+
+/* ========================================
+   Screen Reader Only
+   ======================================== */
+.sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ========================================
+   Focus Styles (Accessibility)
+   ======================================== */
+:focus-visible {
+  outline: 2px solid var(--color-primary, #b02d15);
+  outline-offset: 2px;
+}

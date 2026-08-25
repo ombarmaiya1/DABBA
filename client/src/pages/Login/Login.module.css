@@ -1,0 +1,92 @@
+/* =============================================
+   Login.module.css
+   Receipt/KOT aesthetic for the Login page
+   ============================================= */
+
+/* Full-page background — warm cream with subtle grid texture */
+.pageWrapper {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 2rem 1rem;
+  background-color: #EFE8D8;
+  background-image:
+    linear-gradient(to right, rgba(142, 112, 106, 0.05) 1px, transparent 1px),
+    linear-gradient(to bottom, rgba(142, 112, 106, 0.05) 1px, transparent 1px);
+  background-size: 20px 20px;
+}
+
+/* Brand header above the ticket */
+.brandHeader {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.brandName {
+  font-family: 'Hanken Grotesk', system-ui, sans-serif;
+  font-size: 3rem;
+  font-weight: 900;
+  font-style: italic;
+  letter-spacing: -0.02em;
+  color: #261815;
+  line-height: 1;
+  margin: 0 0 0.5rem 0;
+}
+
+.brandSubtitle {
+  font-family: 'Space Mono', monospace;
+  font-size: 11px;
+  letter-spacing: 0.1em;
+  color: #5a413c;
+  text-transform: uppercase;
+}
+
+/* Main ticket card */
+.ticketCard {
+  width: 100%;
+  max-width: 420px;
+  background-color: #ffffff;
+  border: 1px solid #8e706a;
+  box-shadow: 4px 4px 0px 0px #B35F4E;
+  padding: 2rem 1.5rem 2.5rem;
+  position: relative;
+}
+
+/* Ticket perforation — row of semi-circles along the top */
+.ticketCard::before {
+  content: '';
+  position: absolute;
+  top: -6px;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background-image: radial-gradient(circle at 6px 6px, transparent 6px, #EFE8D8 7px);
+  background-size: 20px 12px;
+  background-repeat: repeat-x;
+  z-index: 10;
+  border-bottom: 1px dashed #8e706a;
+}
+
+/* Ticket zigzag tear-off — bottom edge */
+.ticketCard::after {
+  content: '';
+  position: absolute;
+  bottom: -8px;
+  left: 0;
+  right: 0;
+  height: 8px;
+  background:
+    linear-gradient(135deg, #ffffff 25%, transparent 25%),
+    linear-gradient(225deg, #ffffff 25%, transparent 25%);
+  background-size: 16px 16px;
+  background-position: left bottom;
+  border-top: 1px dashed #8e706a;
+}
+
+@media (min-width: 480px) {
+  .ticketCard {
+    padding: 2rem 2rem 2.5rem;
+  }
+}
