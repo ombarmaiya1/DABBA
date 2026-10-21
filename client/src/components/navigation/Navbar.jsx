@@ -36,8 +36,8 @@ export default function Navbar() {
           <Link
             to="/login"
             className="bg-primary-container text-on-primary px-6 py-2 font-mono text-[12px] uppercase tracking-wider transition-all hover:opacity-90 active:scale-95"
-          > 
-          Login
+          >
+            Login
           </Link>
         </div>
 
