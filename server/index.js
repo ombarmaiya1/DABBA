@@ -63,7 +63,5 @@ app.get("/", (req, res) => {
   res.json("Hello World ");
 });
 
-server.listen(PORT, () => {
-  console.log(`\nServer Started at Port : ${PORT}`);
-});
+server.listen(PORT, () => {});
 

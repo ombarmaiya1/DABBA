@@ -3,14 +3,21 @@ import jwt from "jsonwebtoken";
 import User from "../user/user.model.js";
 import sendOTPEmail from "../services/email.service.js";
 import OTP from "./otp.model.js";
+import { JWT_SECRET } from "../config/config.js";
 
 const RegisterUser = async (req, res, next) => {
   try {
     const { fullName, email, phone, password, userType } = req.body;
-    if (!fullName || !email || !phone || !password || !userType) {
+    if (!fullName || !email || !phone || !password) {
       return res.status(400).json({ message: "All fields are required" });
     }
 
+    if (userType === "Admin") {
+      return res.status(400).json({ message: "Admin registration is not allowed" });
+    }
+
+    const allowedRoles = ["Customer", "Restaurant", "Rider"];
+    const assignedRole = allowedRoles.includes(userType) ? userType : "Customer";
 
     const existingUser = await User.findOne({ email });
     if (existingUser) {
@@ -30,7 +37,7 @@ const RegisterUser = async (req, res, next) => {
         url: photoURL,
         publicId: null,
       },
-      userType,
+      userType: assignedRole,
     });
 
     await newUser.save();
@@ -62,19 +69,36 @@ const LoginUser = async (req, res, next) => {
       return res.status(400).json({ message: "Invalid Password" });
     }
 
-    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET, {
+    if (user.isActive === false) {
+      return res.status(403).json({
+        message: "Your account has been deactivated by administrator. Please contact support.",
+      });
+    }
+
+    const token = jwt.sign({ id: user._id }, process.env.JWT_SECRET || JWT_SECRET, {
       expiresIn: "1h",
     });
 
     res.cookie("token", token, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production" || false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 60 * 60 * 24 * 1000,
     });
 
-    return res
-      .status(200)
-      .json({ message: `Login successful ${user.userType} ` });
+    return res.status(200).json({
+      message: `Login successful`,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        userType: user.userType,
+        photo: user.photo,
+        isActive: user.isActive !== false,
+        isAvailable: user.isAvailable !== false,
+      },
+    });
   } catch (error) {
     error.statusCode = 500;
     error.message = "Error occurred while logging in";
@@ -83,7 +107,11 @@ const LoginUser = async (req, res, next) => {
 };
 
 const LogoutUser = (req, res) => {
-  res.clearCookie("token");
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === "production",
+    sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
+  });
   return res.status(200).json({ message: "Logout successful" });
 };
 
@@ -143,13 +171,14 @@ const VerifyOTP = async (req, res, next) => {
     await existingOTP.deleteOne();
 
 
-    const otpToken = jwt.sign({ email }, process.env.JWT_SECRET, {
+    const otpToken = jwt.sign({ email }, process.env.JWT_SECRET || JWT_SECRET, {
       expiresIn: "10m",
     });
 
     res.cookie("otpToken", otpToken, {
       httpOnly: true,
-      secure: process.env.NODE_ENV === "production" || false,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: process.env.NODE_ENV === "production" ? "none" : "lax",
       maxAge: 10 * 60 * 1000,
     });
 
@@ -162,10 +191,7 @@ const VerifyOTP = async (req, res, next) => {
 };
 const ResetPassword = async (req, res, next) => {
   try {
-    console.log("ResetPassword called");
     const { password } = req.body;
-
-    console.log(password);
 
     if (!password) {
       return res.status(400).json({ message: "Password is required" });

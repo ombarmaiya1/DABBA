@@ -1,11 +1,12 @@
 import React, { useState } from 'react';
-import { Link, useNavigate } from 'react-router-dom';
+import { Link, useNavigate, useSearchParams } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import LineInput from '../../components/common/LineInput';
 import PasswordInput from '../../components/common/PasswordInput';
 import styles from './Login.module.css';
 import { toast } from 'react-hot-toast';
-import { login } from '../../services/auth.service';
+import { useAuth } from '../../context/AuthContext';
+import { getHomeRoute } from '../../components/auth/RouteGuards';
 
 /* ─────────────────────────────────────────────
    Login Page
@@ -14,6 +15,8 @@ import { login } from '../../services/auth.service';
    ───────────────────────────────────────────── */
 export default function Login() {
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
+  const { login } = useAuth();
 
   const [form, setForm] = useState({
     email: '',
@@ -50,7 +53,7 @@ export default function Login() {
   }
 
   /* ── Submit handler ── */
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     e.preventDefault();
     const validationErrors = validate();
     if (Object.keys(validationErrors).length > 0) {
@@ -60,28 +63,28 @@ export default function Login() {
     
     setIsSubmitting(true);
     
-    login({ email: form.email, password: form.password })
-      .then((res) => {
-        toast.success(res.message || 'Logged in successfully!');
-        // Placeholder navigation to dashboard or home
-        navigate('/');
-      })
-      .catch((err) => {
-        // Axios stores the backend's 400 response in err.response.data
-        const backendMessage = err.response?.data?.message || 'Login failed. Please try again.';
-        
-        toast.error(backendMessage);
-        
-        // Associate specific errors with fields if possible
-        if (backendMessage.toLowerCase().includes('password')) {
-          setErrors((prev) => ({ ...prev, password: backendMessage }));
-        } else if (backendMessage.toLowerCase().includes('user') || backendMessage.toLowerCase().includes('email')) {
-          setErrors((prev) => ({ ...prev, email: backendMessage }));
-        }
-      })
-      .finally(() => {
-        setIsSubmitting(false);
-      });
+    try {
+      const res = await login({ email: form.email.trim(), password: form.password });
+      toast.success(res?.message || 'Logged in successfully!');
+
+      const redirectTarget = searchParams.get('redirect');
+      if (redirectTarget && redirectTarget !== '/') {
+        navigate(redirectTarget, { replace: true });
+      } else {
+        navigate(getHomeRoute(res?.user), { replace: true });
+      }
+    } catch (err) {
+      const backendMessage = err.response?.data?.message || 'Login failed. Please try again.';
+      toast.error(backendMessage);
+      
+      if (backendMessage.toLowerCase().includes('password')) {
+        setErrors((prev) => ({ ...prev, password: backendMessage }));
+      } else if (backendMessage.toLowerCase().includes('user') || backendMessage.toLowerCase().includes('email') || backendMessage.toLowerCase().includes('credential')) {
+        setErrors((prev) => ({ ...prev, email: backendMessage }));
+      }
+    } finally {
+      setIsSubmitting(false);
+    }
   }
 
   return (

@@ -85,7 +85,7 @@ export default function LandingPage() {
             className="flex flex-wrap gap-4 mt-2 items-center"
           >
             <Link
-              to="/order"
+              to="/restaurants"
               className="inline-flex items-center gap-2 bg-primary-container text-on-primary px-8 py-4 font-mono text-[12px] uppercase tracking-wider transition-all hover:-translate-y-0.5 hover:translate-x-0.5 hover:shadow-[8px_8px_0px_var(--color-ink)] active:scale-95"
             >
               Order now <ArrowRight size={16} />
@@ -219,12 +219,12 @@ export default function LandingPage() {
             >
               Top Restaurants
             </h2>
-            <a
-              href="#"
+            <Link
+              to="/restaurants"
               className="font-mono text-[12px] uppercase tracking-wider underline text-on-surface hover:text-primary transition-colors"
             >
               View all
-            </a>
+            </Link>
           </motion.div>
 
           {/* Restaurant Cards Grid */}
@@ -274,12 +274,12 @@ export default function LandingPage() {
             <br className="hidden md:block" />
             Partner with us.
           </h3>
-          <button
-            type="button"
-            className="bg-primary text-on-primary px-10 py-4 font-mono text-[12px] uppercase tracking-widest border border-primary hover:bg-transparent hover:text-primary transition-all active:scale-95 whitespace-nowrap"
+          <Link
+            to="/register"
+            className="bg-primary text-on-primary px-10 py-4 font-mono text-[12px] uppercase tracking-widest border border-primary hover:bg-transparent hover:text-primary transition-all active:scale-95 whitespace-nowrap inline-block text-center"
           >
             Join the network
-          </button>
+          </Link>
         </motion.div>
       </section>
 

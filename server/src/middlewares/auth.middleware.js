@@ -5,16 +5,13 @@ import { JWT_SECRET } from "../config/config.js";
 export const AuthOTP = async (req, res, next) => {
     try {
         const otpToken = req.cookies.otpToken;
-        console.log(otpToken)
         if (!otpToken) {
             return res.status(400).json({ message: "OTP Expired" });
         }
         
         const decoded = jwt.verify(otpToken, process.env.JWT_SECRET || JWT_SECRET);
         const email = decoded.email;
-        console.log(email)
         req.user = { email };
-        console.log(req.user)
         next();
     } catch (error) {
         return res.status(400).json({ message: "Invalid or expired OTP token" });
@@ -38,6 +35,10 @@ export const AuthUser = async (req, res, next) => {
         const user = await User.findById(decoded.id).select("-password");
         if (!user) {
             return res.status(401).json({ message: "Unauthorized: User not found" });
+        }
+
+        if (user.isActive === false) {
+            return res.status(403).json({ message: "Forbidden: Your account has been deactivated" });
         }
 
         req.user = user;

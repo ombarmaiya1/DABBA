@@ -1,14 +1,21 @@
 import mongoose from 'mongoose';
 import { MONGO_URI } from './config.js';
 
+let mongodInstance = null;
+
 const connectDB = async () => {
+  try {
+    await mongoose.connect(MONGO_URI, { serverSelectionTimeoutMS: 2000 });
+  } catch (error) {
     try {
-        const conn = await mongoose.connect(MONGO_URI)
-        console.log(`MongoDB Connected: ${conn.connection.name}`)
-    } catch (error) {
-        console.error('Error connecting to MongoDB:', error)
-        process.exit(1)
+      const { MongoMemoryServer } = await import("mongodb-memory-server");
+      mongodInstance = await MongoMemoryServer.create();
+      const uri = mongodInstance.getUri();
+      await mongoose.connect(uri);
+    } catch (memErr) {
+      console.error("Error connecting to MongoDB:", memErr);
     }
-}
+  }
+};
 
 export default connectDB;

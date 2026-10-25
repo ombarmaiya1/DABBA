@@ -152,9 +152,18 @@ export const ToggleOpenStatus = async (req, res, next) => {
       return res.status(404).json({ message: "Restaurant not found" });
     }
 
-    // Check if the logged-in user is the owner
-    if (restaurant.owner.toString() !== req.user._id.toString()) {
+    // Check if the logged-in user is the owner or an Admin
+    if (
+      restaurant.owner.toString() !== req.user._id.toString() &&
+      req.user.userType !== "Admin"
+    ) {
       return res.status(403).json({ message: "You can only change status of your own restaurant" });
+    }
+
+    if (restaurant.isActive === false && !restaurant.isOpen) {
+      return res.status(400).json({
+        message: "Cannot open a deactivated kitchen. Please activate the kitchen first.",
+      });
     }
 
     restaurant.isOpen = !restaurant.isOpen;
@@ -167,6 +176,50 @@ export const ToggleOpenStatus = async (req, res, next) => {
   } catch (error) {
     error.statusCode = 500;
     error.message = "Error occurred while updating status";
+    next(error);
+  }
+};
+
+// Step 6.5: Platform Activation / Deactivation (Admin only)
+export const ToggleRestaurantActivation = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    const restaurant = await Restaurant.findById(id).populate("owner", "fullName email phone");
+    if (!restaurant) {
+      return res.status(404).json({ message: "Restaurant not found" });
+    }
+
+    restaurant.isActive = typeof isActive === "boolean" ? isActive : (restaurant.isActive === false ? true : false);
+    // If deactivating, also force isOpen to false
+    if (!restaurant.isActive) {
+      restaurant.isOpen = false;
+    }
+    await restaurant.save();
+
+    return res.status(200).json({
+      success: true,
+      message: `Kitchen "${restaurant.name}" is now ${restaurant.isActive ? "active" : "deactivated"}`,
+      restaurant,
+    });
+  } catch (error) {
+    error.statusCode = 500;
+    error.message = error.message || "Error occurred while updating kitchen activation";
+    next(error);
+  }
+};
+
+// Step 7: Get logged-in user's owned restaurant
+export const GetMyRestaurant = async (req, res, next) => {
+  try {
+    const restaurant = await Restaurant.findOne({ owner: req.user._id });
+    return res.status(200).json({
+      restaurant: restaurant || null,
+    });
+  } catch (error) {
+    error.statusCode = 500;
+    error.message = error.message || "Error occurred while fetching restaurant";
     next(error);
   }
 };

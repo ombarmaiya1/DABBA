@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { useNavigate, useSearchParams } from 'react-router-dom';
 import { Link } from 'react-router-dom';
 import { ArrowRight } from 'lucide-react';
 import LineInput from '../../components/common/LineInput';
@@ -13,25 +13,16 @@ import { register } from '../../services/auth.service';
    ───────────────────────────────────────────── */
 const ACCOUNT_TYPES = ['Customer', 'Rider', 'Restaurant'];
 
-/* ─────────────────────────────────────────────
-   Register Page
-   Isolated transactional screen — no global Navbar/Footer.
-   Matches the Stitch "Dabba Register" design exactly:
-     - Warm grid-textured background
-     - Ticket card with perforation top + zigzag bottom
-     - Account type selector tabs
-     - 5 line-style inputs
-     - Create Account CTA + legal disclaimer
-   ───────────────────────────────────────────── */
 export default function Register() {
-
-const navigate = useNavigate();
+  const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
 
   const [form, setForm] = useState({
     fullName: '',
     email: '',
     phone: '',
     password: '',
+    confirmPassword: '',
     userType: 'Customer'
   });
   const [errors, setErrors] = useState({});
@@ -69,7 +60,7 @@ const navigate = useNavigate();
     return next;
   }
 
-  /* ── Submit handler (UI only — no API) ── */
+  /* ── Submit handler ── */
   function handleSubmit(e) {
     e.preventDefault();
     const validationErrors = validate();
@@ -78,20 +69,26 @@ const navigate = useNavigate();
       return;
     }
     setIsSubmitting(true);
-    register(form)
+    register({
+      fullName: form.fullName.trim(),
+      email: form.email.trim(),
+      phone: form.phone.trim(),
+      password: form.password,
+      userType: form.userType,
+    })
       .then((res) => {
-        toast.success(res.message || 'Account created successfully!');
-        // On success, you could redirect to login here: navigate('/login')
-        navigate('/login');
+        toast.success(res.message || 'Account created successfully! Please sign in.');
+        const redirectTarget = searchParams.get('redirect');
+        if (redirectTarget) {
+          navigate(`/login?redirect=${encodeURIComponent(redirectTarget)}`);
+        } else {
+          navigate('/login');
+        }
       })
       .catch((err) => {
-        // Axios stores the backend's 400 response in err.response.data
         const backendMessage = err.response?.data?.message || 'Registration failed. Please try again.';
-        
-        // Show toaster notification
         toast.error(backendMessage);
         
-        // Also show the error specifically on the email field if applicable
         if (backendMessage.toLowerCase().includes('already exists')) {
           setErrors((prev) => ({ ...prev, email: backendMessage }));
         }

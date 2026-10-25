@@ -1,5 +1,6 @@
 import Cart from "./cart.model.js";
 import Menu from "../menu/menu.model.js";
+import Restaurant from "../resturants/restaurant.model.js";
 
 // 1. Get the customer's cart
 // GET /cart
@@ -41,6 +42,12 @@ export const AddToCart = async (req, res, next) => {
     const menuItem = await Menu.findById(menuItemId);
     if (!menuItem) {
       return res.status(404).json({ message: "Menu item not found" });
+    }
+
+    // Verify restaurant is active
+    const restaurant = await Restaurant.findById(menuItem.restaurant);
+    if (!restaurant || restaurant.isActive === false) {
+      return res.status(400).json({ message: "This kitchen is currently deactivated and not accepting orders" });
     }
 
     // Find or create cart for user

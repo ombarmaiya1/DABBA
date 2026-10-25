@@ -5,12 +5,19 @@ import {
   AssignRider,
   GetMyDeliveries,
   UpdateDeliveryStatus,
+  GetRiderAvailability,
+  ToggleRiderAvailability,
 } from "./rider.controller.js";
 
 const router = Router();
 
 // All rider routes require Rider or Admin role
 router.use(AuthUser, AuthorizeRoles("Rider", "Admin"));
+
+// 0. Rider availability status (Open / Closed for delivery): GET & PATCH /rider/availability
+router.get("/availability", GetRiderAvailability);
+router.patch("/availability", ToggleRiderAvailability);
+router.patch("/status/toggle", ToggleRiderAvailability);
 
 // 1. List available orders for delivery: GET /rider/available-orders
 router.get("/available-orders", GetAvailableDeliveries);

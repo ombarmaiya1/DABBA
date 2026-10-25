@@ -4,6 +4,9 @@ import {
   CreateOrder,
   GetMyOrders,
   GetOrderById,
+  GetRestaurantOrders,
+  UpdateRestaurantOrderStatus,
+  GetAllOrdersAdmin,
 } from "./order.controller.js";
 import {
   GetAvailableDeliveries,
@@ -16,6 +19,16 @@ const router = Router();
 
 // All order routes require authentication
 router.use(AuthUser);
+
+// Admin-only: GET /orders/admin/all
+router.get("/admin/all", AuthorizeRoles("Admin"), GetAllOrdersAdmin);
+
+// Restaurant owner routes (Must be defined before /:id)
+// 1. Get restaurant orders: GET /orders/restaurant/orders
+router.get("/restaurant/orders", AuthorizeRoles("Restaurant", "Admin"), GetRestaurantOrders);
+
+// 2. Update status: PATCH /orders/:orderId/restaurant-status
+router.patch("/:orderId/restaurant-status", AuthorizeRoles("Restaurant", "Admin"), UpdateRestaurantOrderStatus);
 
 // Rider routes (Must be defined before /:id)
 // 1. List eligible orders for riders: GET /orders/available-for-delivery

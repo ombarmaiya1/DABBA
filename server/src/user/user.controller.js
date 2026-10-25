@@ -1,4 +1,5 @@
 import User from "./user.model.js";
+import Restaurant from "../resturants/restaurant.model.js";
 
 // GET /user/me
 // Returns the currently authenticated user
@@ -88,10 +89,26 @@ export const UpdateProfile = async (req, res, next) => {
 };
 
 // GET /user/all (Admin only)
-// Example role-protected endpoint to get all registered users
+// Retrieves registered users sorted by roles, excluding Admins by default
 export const GetAllUsers = async (req, res, next) => {
   try {
-    const users = await User.find().select("-password");
+    const { includeAdmin, role } = req.query;
+    const filter = {};
+
+    // Exclude Admin users from registered users list unless explicitly requested
+    if (includeAdmin !== "true") {
+      filter.userType = { $ne: "Admin" };
+    }
+
+    if (role && role !== "all") {
+      filter.userType = role;
+    }
+
+    // Sort by role (userType) ascending, then by creation date descending
+    const users = await User.find(filter)
+      .select("-password")
+      .sort({ userType: 1, createdAt: -1 });
+
     return res.status(200).json({
       success: true,
       count: users.length,
@@ -129,3 +146,47 @@ export const GetUserById = async (req, res, next) => {
     next(error);
   }
 };
+
+// PATCH /user/:id/status (Admin only)
+// Activates or deactivates a user
+export const ToggleUserStatus = async (req, res, next) => {
+  try {
+    const { id } = req.params;
+    const { isActive } = req.body;
+
+    const user = await User.findById(id);
+    if (!user) {
+      return res.status(404).json({ message: "User not found" });
+    }
+
+    if (user.userType === "Admin") {
+      return res.status(400).json({ message: "Admin users cannot be deactivated" });
+    }
+
+    user.isActive = typeof isActive === "boolean" ? isActive : !user.isActive;
+    await user.save();
+
+    // If a restaurant owner is deactivated, also mark their restaurant inactive & closed
+    if (user.userType === "Restaurant" && !user.isActive) {
+      await Restaurant.updateMany({ owner: user._id }, { isActive: false, isOpen: false });
+    }
+
+    return res.status(200).json({
+      success: true,
+      message: `User "${user.fullName}" is now ${user.isActive ? "active" : "deactivated"}`,
+      user: {
+        _id: user._id,
+        fullName: user.fullName,
+        email: user.email,
+        phone: user.phone,
+        userType: user.userType,
+        isActive: user.isActive,
+      },
+    });
+  } catch (error) {
+    error.statusCode = 500;
+    error.message = error.message || "Error occurred while updating user status";
+    next(error);
+  }
+};
+

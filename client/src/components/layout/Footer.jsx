@@ -1,12 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
 import { FOOTER_LINKS } from '../../constants/data';
+import { useAuth } from '../../context/AuthContext';
+import { getHomeRoute } from '../auth/RouteGuards';
 
 /**
  * Footer — 4-column footer matching the Stitch design.
  * Dashed top border, receipt aesthetic with Space Mono section headers.
  */
 export default function Footer() {
+  const { user, isAuthenticated } = useAuth();
   const footerSections = [
     { title: 'Legal', links: FOOTER_LINKS.legal },
     { title: 'Contact', links: FOOTER_LINKS.contact },
@@ -22,7 +25,7 @@ export default function Footer() {
         {/* Brand Column */}
         <div className="col-span-1">
           <Link
-            to="/"
+            to={isAuthenticated ? getHomeRoute(user) : "/"}
             className="font-mono font-bold text-primary mb-6 block text-[24px]"
             aria-label="DABBA home"
           >

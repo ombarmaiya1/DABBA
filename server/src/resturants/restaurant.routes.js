@@ -4,9 +4,11 @@ import { upload } from "../middlewares/multer.middleware.js";
 import {
   CreateRestaurant,
   GetRestaurants,
+  GetMyRestaurant,
   GetSingleRestaurant,
   UpdateRestaurant,
   ToggleOpenStatus,
+  ToggleRestaurantActivation,
 } from "./restaurant.controller.js";
 import {
   AddMenuItem,
@@ -27,6 +29,9 @@ router.post(
 // Step 3: Get all restaurants (Public)
 router.get("/", GetRestaurants);
 
+// Step 3.5: Get owned restaurant for logged in owner
+router.get("/mine", AuthUser, AuthorizeRoles("Restaurant", "Admin"), GetMyRestaurant);
+
 // Step 4: Get single restaurant (Public)
 router.get("/:id", GetSingleRestaurant);
 
@@ -38,8 +43,11 @@ router.put(
   UpdateRestaurant
 );
 
-// Step 6: Open / close restaurant (Only Owner)
+// Step 6: Open / close restaurant (Owner or Admin)
 router.patch("/:id/status", AuthUser, ToggleOpenStatus);
+
+// Step 6.5: Platform Activation / Deactivation (Admin only)
+router.patch("/:id/activation", AuthUser, AuthorizeRoles("Admin"), ToggleRestaurantActivation);
 
 // Menu endpoints:
 // 1. Add menu item: POST /restaurants/:restaurantId/menu

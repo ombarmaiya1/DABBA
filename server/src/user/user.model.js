@@ -39,6 +39,14 @@ const UserSchema = mongoose.Schema(
       required: true,
       default: "Customer",
     },
+    isActive: {
+      type: Boolean,
+      default: true,
+    },
+    isAvailable: {
+      type: Boolean,
+      default: true,
+    },
   },
   {
     timestamps: true,
