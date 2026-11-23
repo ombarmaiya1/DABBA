@@ -1,0 +1,41 @@
+[
+  {
+    "id": "dep_1795375103493",
+    "projectName": "DABBA",
+    "provider": "local-tar",
+    "method": "docker",
+    "publicUrl": null,
+    "url": null,
+    "tarPath": "/home/ombarmaiya/Documents/DABBA/DABBA.tar",
+    "dashboardUrl": null,
+    "dockerImage": null,
+    "status": "live",
+    "timestamp": "2026-11-22T19:18:23.492Z"
+  },
+  {
+    "id": "dpl_4DMuBF5PPCrHZiFRRXYJBugtyoSr",
+    "projectName": "DABBA",
+    "provider": "vercel",
+    "method": "non-docker",
+    "publicUrl": "https://dabba-94oq9imxk-ombarmaiyacontact-4037s-projects.vercel.app",
+    "url": "https://dabba-94oq9imxk-ombarmaiyacontact-4037s-projects.vercel.app",
+    "tarPath": null,
+    "dashboardUrl": "https://vercel.com/ombarmaiyacontact-4037/dabba",
+    "dockerImage": null,
+    "status": "READY",
+    "timestamp": "2026-11-22T19:02:59.982Z"
+  },
+  {
+    "id": "dpl_AbimCjnhb7gKaRdmzYBcJefwge4F",
+    "projectName": "DABBA",
+    "provider": "vercel",
+    "method": "non-docker",
+    "publicUrl": "https://dabba-qqgxaqywf-ombarmaiyacontact-4037s-projects.vercel.app",
+    "url": "https://dabba-qqgxaqywf-ombarmaiyacontact-4037s-projects.vercel.app",
+    "tarPath": null,
+    "dashboardUrl": "https://vercel.com/ombarmaiyacontact-4037/dabba",
+    "dockerImage": null,
+    "status": "READY",
+    "timestamp": "2026-11-22T18:30:25.766Z"
+  }
+]

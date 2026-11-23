@@ -1,0 +1,38 @@
+# Logs and debug
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# Runtime and local dependencies
+node_modules/
+.pnp
+.pnp.js
+
+# Build outputs
+dist/
+dist-ssr/
+build/
+.next/
+out/
+
+# Environment files containing local secrets
+.env
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
+
+# Version control and IDE files
+.git/
+.gitignore
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+# Docker and test files
+Dockerfile*
+docker-compose*.yml
+test/
+coverage/
